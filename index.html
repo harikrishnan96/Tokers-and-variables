@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Harikrishnan | FIDE Rated Chess Coach</title>
+  <meta name="description" content="Learn chess from a FIDE-rated coach with 6+ years of experience. Transforming beginners into rated players. Book a free trial session today." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --navy: #050d1a;
+      --navy2: #0b1628;
+      --navy3: #0f1e35;
+      --gold: #f0b429;
+      --gold2: #ffd166;
+      --cream: #f5f0e8;
+      --white: #ffffff;
+      --green: #1a9e6e;
+      --green2: #22c55e;
+      --text-muted: #8fa3bf;
+      --glass: rgba(255,255,255,0.05);
+      --glass-border: rgba(255,255,255,0.1);
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--navy);
+      color: var(--white);
+      overflow-x: hidden;
+    }
+
+    /* ─── CANVAS BACKGROUND ─── */
+    #bg-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    /* ─── NAV ─── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      padding: 18px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: rgba(5,13,26,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--glass-border);
+      transition: padding 0.3s;
+    }
+    nav.scrolled { padding: 12px 40px; }
+
+    .nav-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 900;
+      color: var(--gold);
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .nav-logo span { color: var(--white); }
+
+    .nav-links {
+      display: flex;
+      align-items: center;
+      gap: 32px;
+      list-style: none;
+    }
+    .nav-links a {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      letter-spacing: 0.5px;
+      transition: color 0.3s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    .nav-cta {
+      background: linear-gradient(135deg, var(--gold), #e09800);
+      color: var(--navy) !important;
+      padding: 10px 22px;
+      border-radius: 50px;
+      font-weight: 700 !important;
+      color: var(--navy) !important;
+      transition: transform 0.2s, box-shadow 0.2s !important;
+    }
+    .nav-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(240,180,41,0.4); color: var(--navy) !important; }
+
+    .hamburger {
+      display: none;
+      flex-direction: column;
+      gap: 5px;
+      cursor: pointer;
+      padding: 5px;
+    }
+    .hamburger span {
+      width: 25px; height: 2px;
+      background: var(--white);
+      border-radius: 2px;
+      transition: all 0.3s;
+    }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+    /* ─── HERO ─── */
+    #hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 120px 40px 80px;
+      z-index: 1;
+      overflow: hidden;
+    }
+
+    .hero-inner {
+      max-width: 1200px;
+      width: 100%;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 60px;
+      align-items: center;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(240,180,41,0.15);
+      border: 1px solid rgba(240,180,41,0.4);
+      color: var(--gold);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 8px 16px;
+      border-radius: 50px;
+      margin-bottom: 24px;
+    }
+
+    .hero-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.8rem, 5vw, 4.5rem);
+      font-weight: 900;
+      line-height: 1.1;
+      margin-bottom: 24px;
+    }
+    .hero-title .gold { color: var(--gold); }
+    .hero-title .outline {
+      -webkit-text-stroke: 2px var(--gold);
+      color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 36px;
+      max-width: 480px;
+    }
+
+    .hero-btns {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--gold), #e09800);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 16px 36px;
+      border-radius: 50px;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform 0.2s, box-shadow 0.2s;
+      box-shadow: 0 8px 30px rgba(240,180,41,0.3);
+    }
+    .btn-primary:hover { transform: translateY(-3px); box-shadow: 0 15px 40px rgba(240,180,41,0.5); }
+
+    .btn-secondary {
+      background: var(--glass);
+      color: var(--white);
+      font-weight: 600;
+      font-size: 1rem;
+      padding: 16px 36px;
+      border-radius: 50px;
+      text-decoration: none;
+      border: 1px solid var(--glass-border);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: all 0.2s;
+      backdrop-filter: blur(10px);
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-3px); }
+
+    .hero-stats {
+      display: flex;
+      gap: 32px;
+      margin-top: 48px;
+      flex-wrap: wrap;
+    }
+    .hero-stat { }
+    .hero-stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 900;
+      color: var(--gold);
+      display: block;
+    }
+    .hero-stat-label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* Hero visual - 3D chess board */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .chess-scene {
+      position: relative;
+      width: 360px;
+      height: 360px;
+      perspective: 800px;
+    }
+
+    .chess-board-3d {
+      width: 100%;
+      height: 100%;
+      transform-style: preserve-3d;
+      transform: rotateX(25deg) rotateY(-15deg);
+      animation: boardFloat 6s ease-in-out infinite;
+    }
+
+    @keyframes boardFloat {
+      0%, 100% { transform: rotateX(25deg) rotateY(-15deg) translateY(0); }
+      50% { transform: rotateX(25deg) rotateY(-15deg) translateY(-15px); }
+    }
+
+    .board-grid {
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      width: 280px;
+      height: 280px;
+      position: absolute;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      border: 3px solid var(--gold);
+      border-radius: 4px;
+      box-shadow: 0 30px 60px rgba(0,0,0,0.6), 0 0 40px rgba(240,180,41,0.2), inset 0 0 20px rgba(0,0,0,0.3);
+    }
+
+    .board-cell {
+      aspect-ratio: 1;
+    }
+    .board-cell.light { background: #f0d9b5; }
+    .board-cell.dark { background: #b58863; }
+
+    .piece-on-board {
+      position: absolute;
+      font-size: 2.2rem;
+      filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.7));
+      animation: pieceFloat 3s ease-in-out infinite;
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    @keyframes pieceFloat {
+      0%, 100% { transform: translate(-50%, -50%) translateY(0) rotateY(0deg); }
+      50% { transform: translate(-50%, -50%) translateY(-8px) rotateY(10deg); }
+    }
+
+    /* Orbiting pieces */
+    .orbit-container {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0; left: 0;
+    }
+
+    .orbit-piece {
+      position: absolute;
+      font-size: 1.6rem;
+      filter: drop-shadow(0 4px 8px rgba(240,180,41,0.5));
+      opacity: 0.8;
+      animation: orbit linear infinite;
+    }
+
+    @keyframes orbit {
+      from { transform: rotate(var(--start-angle)) translateX(var(--radius)) rotate(calc(-1 * var(--start-angle))); }
+      to { transform: rotate(calc(var(--start-angle) + 360deg)) translateX(var(--radius)) rotate(calc(-1 * (var(--start-angle) + 360deg))); }
+    }
+
+    .glow-ring {
+      position: absolute;
+      width: 320px; height: 320px;
+      border-radius: 50%;
+      border: 1px solid rgba(240,180,41,0.2);
+      top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      animation: glowPulse 3s ease-in-out infinite;
+    }
+
+    .glow-ring:nth-child(2) {
+      width: 380px; height: 380px;
+      border-color: rgba(240,180,41,0.1);
+      animation-delay: 1s;
+    }
+
+    @keyframes glowPulse {
+      0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); }
+      50% { opacity: 1; transform: translate(-50%, -50%) scale(1.03); }
+    }
+
+    /* ─── SECTION COMMON ─── */
+    section { position: relative; z-index: 1; }
+
+    .section-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--gold);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+    .section-label::before {
+      content: '';
+      width: 24px; height: 2px;
+      background: var(--gold);
+    }
+
+    .section-title {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2rem, 3.5vw, 2.8rem);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 16px;
+    }
+    .section-title .gold { color: var(--gold); }
+
+    .section-desc {
+      font-size: 1rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 600px;
+    }
+
+    /* ─── ABOUT ─── */
+    #about {
+      padding: 100px 40px;
+      background: linear-gradient(180deg, var(--navy) 0%, var(--navy2) 100%);
+    }
+
+    .about-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 80px;
+      align-items: center;
+    }
+
+    .about-photos {
+      position: relative;
+      height: 520px;
+    }
+
+    .photo-main {
+      position: absolute;
+      width: 300px;
+      height: 380px;
+      border-radius: 20px;
+      object-fit: cover;
+      top: 0; left: 0;
+      border: 3px solid var(--gold);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(240,180,41,0.15);
+      transition: transform 0.4s;
+    }
+    .photo-main:hover { transform: scale(1.02) rotate(-1deg); }
+
+    .photo-secondary {
+      position: absolute;
+      width: 200px;
+      height: 250px;
+      border-radius: 16px;
+      object-fit: cover;
+      bottom: 0; right: 0;
+      border: 3px solid var(--green2);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+      transition: transform 0.4s;
+    }
+    .photo-secondary:hover { transform: scale(1.02) rotate(1deg); }
+
+    .photo-action {
+      position: absolute;
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      object-fit: cover;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      border: 4px solid var(--gold2);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 20px rgba(240,180,41,0.3);
+    }
+
+    .photo-badge {
+      position: absolute;
+      bottom: 60px;
+      left: -20px;
+      background: var(--gold);
+      color: var(--navy);
+      font-weight: 700;
+      font-size: 0.8rem;
+      padding: 12px 20px;
+      border-radius: 12px;
+      box-shadow: 0 10px 30px rgba(240,180,41,0.4);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .photo-placeholder {
+      background: linear-gradient(135deg, #1a2a40, #0d1c30);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+    }
+    .photo-placeholder .piece { font-size: 3rem; opacity: 0.5; }
+
+    .about-content { }
+
+    .about-bio {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      margin-bottom: 32px;
+    }
+    .about-bio strong { color: var(--white); }
+
+    .achievements-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 36px;
+    }
+
+    .achievement-card {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      transition: border-color 0.3s, transform 0.2s;
+    }
+    .achievement-card:hover { border-color: var(--gold); transform: translateY(-2px); }
+
+    .achievement-icon {
+      font-size: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .achievement-text h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .achievement-text p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── WHY CHESS ─── */
+    #why-chess {
+      padding: 100px 40px;
+      background: var(--navy2);
+    }
+
+    .why-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .why-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    .why-header .section-desc { margin: 0 auto; }
+
+    .benefits-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    .benefit-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.04) 0%, rgba(255,255,255,0.01) 100%);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 36px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+      cursor: default;
+    }
+
+    .benefit-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0;
+      right: 0; height: 2px;
+      background: linear-gradient(90deg, transparent, var(--gold), transparent);
+      opacity: 0;
+      transition: opacity 0.4s;
+    }
+    .benefit-card:hover::before { opacity: 1; }
+    .benefit-card:hover {
+      transform: translateY(-8px);
+      border-color: rgba(240,180,41,0.2);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .benefit-bg-piece {
+      position: absolute;
+      bottom: -10px; right: -10px;
+      font-size: 5rem;
+      opacity: 0.05;
+      pointer-events: none;
+      transition: opacity 0.4s, transform 0.4s;
+    }
+    .benefit-card:hover .benefit-bg-piece { opacity: 0.1; transform: scale(1.1) rotate(-5deg); }
+
+    .benefit-icon-wrap {
+      width: 56px; height: 56px;
+      border-radius: 16px;
+      background: rgba(240,180,41,0.1);
+      border: 1px solid rgba(240,180,41,0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.6rem;
+      margin-bottom: 20px;
+    }
+
+    .benefit-card h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+    }
+    .benefit-card p {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ─── PROGRAMS ─── */
+    #programs {
+      padding: 100px 40px;
+      background: var(--navy);
+    }
+
+    .programs-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .programs-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+    .programs-header .section-desc { margin: 0 auto; }
+
+    .programs-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 28px;
+    }
+
+    .program-card {
+      background: linear-gradient(160deg, var(--navy3), var(--navy2));
+      border: 1px solid var(--glass-border);
+      border-radius: 24px;
+      padding: 36px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s;
+    }
+
+    .program-card.featured {
+      border-color: var(--gold);
+      background: linear-gradient(160deg, #0f1e35, #1a2e48);
+      box-shadow: 0 20px 60px rgba(240,180,41,0.15);
+    }
+
+    .program-badge {
+      position: absolute;
+      top: -1px; right: 24px;
+      background: var(--gold);
+      color: var(--navy);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 0 0 12px 12px;
+    }
+
+    .program-icon {
+      font-size: 2.5rem;
+      margin-bottom: 16px;
+    }
+
+    .program-card h3 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 700;
+      margin-bottom: 8px;
+      color: var(--white);
+    }
+
+    .program-level {
+      font-size: 0.78rem;
+      color: var(--gold);
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .program-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 24px;
+    }
+
+    .program-features {
+      list-style: none;
+      margin-bottom: 28px;
+    }
+    .program-features li {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      padding: 6px 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid var(--glass-border);
+    }
+    .program-features li:last-child { border: none; }
+    .program-features li::before {
+      content: '♟';
+      color: var(--gold);
+      font-size: 0.7rem;
+    }
+
+    .program-cta {
+      display: block;
+      text-align: center;
+      padding: 13px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-decoration: none;
+      transition: all 0.2s;
+    }
+    .program-cta.primary-cta {
+      background: linear-gradient(135deg, var(--gold), #e09800);
+      color: var(--navy);
+    }
+    .program-cta.primary-cta:hover { box-shadow: 0 8px 25px rgba(240,180,41,0.4); transform: translateY(-2px); }
+    .program-cta.outline-cta {
+      border: 1px solid var(--glass-border);
+      color: var(--text-muted);
+    }
+    .program-cta.outline-cta:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+    /* ─── STATS TICKER ─── */
+    #stats {
+      padding: 60px 40px;
+      background: linear-gradient(135deg, var(--navy3), var(--navy2));
+      border-top: 1px solid var(--glass-border);
+      border-bottom: 1px solid var(--glass-border);
+    }
+
+    .stats-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 40px;
+      text-align: center;
+    }
+
+    .stat-item { }
+
+    .stat-num {
+      font-family: 'Playfair Display', serif;
+      font-size: 3.5rem;
+      font-weight: 900;
+      color: var(--gold);
+      display: block;
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+    }
+
+    /* ─── TESTIMONIALS ─── */
+    #testimonials {
+      padding: 100px 40px;
+      background: var(--navy2);
+      overflow: hidden;
+    }
+
+    .testimonials-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .testimonials-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .testimonials-track {
+      display: flex;
+      gap: 24px;
+      animation: scrollTestimonials 30s linear infinite;
+      width: max-content;
+    }
+    .testimonials-track:hover { animation-play-state: paused; }
+
+    @keyframes scrollTestimonials {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    .testimonial-card {
+      background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 28px;
+      width: 320px;
+      flex-shrink: 0;
+      transition: border-color 0.3s;
+    }
+    .testimonial-card:hover { border-color: rgba(240,180,41,0.3); }
+
+    .testimonial-stars {
+      color: var(--gold);
+      font-size: 0.9rem;
+      margin-bottom: 14px;
+    }
+
+    .testimonial-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 20px;
+      font-style: italic;
+    }
+
+    .testimonial-author {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .author-avatar {
+      width: 44px; height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--gold), #e09800);
+      color: var(--navy);
+      font-family: 'Playfair Display', serif;
+      flex-shrink: 0;
+    }
+
+    .author-info h4 {
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .author-info p {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    /* ─── HOW IT WORKS ─── */
+    #how-it-works {
+      padding: 100px 40px;
+      background: var(--navy);
+    }
+
+    .how-inner {
+      max-width: 1000px;
+      margin: 0 auto;
+    }
+
+    .how-header {
+      text-align: center;
+      margin-bottom: 64px;
+    }
+
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 0;
+    }
+
+    .step {
+      display: grid;
+      grid-template-columns: 80px 1fr;
+      gap: 32px;
+      position: relative;
+      padding-bottom: 48px;
+    }
+    .step:last-child { padding-bottom: 0; }
+
+    .step-left {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .step-num {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #e09800);
+      color: var(--navy);
+      font-family: 'Playfair Display', serif;
+      font-size: 1.3rem;
+      font-weight: 900;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 8px 25px rgba(240,180,41,0.3);
+    }
+
+    .step-line {
+      width: 2px;
+      flex: 1;
+      background: linear-gradient(180deg, var(--gold), transparent);
+      margin-top: 8px;
+    }
+    .step:last-child .step-line { display: none; }
+
+    .step-content {
+      padding-top: 12px;
+    }
+    .step-content h3 {
+      font-size: 1.2rem;
+      font-weight: 700;
+      margin-bottom: 10px;
+      color: var(--white);
+    }
+    .step-content p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ─── CTA SECTION ─── */
+    #cta {
+      padding: 100px 40px;
+      background: var(--navy2);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .cta-bg-piece {
+      position: absolute;
+      font-size: 20rem;
+      opacity: 0.03;
+      right: -60px;
+      top: 50%;
+      transform: translateY(-50%) rotate(-15deg);
+      pointer-events: none;
+      line-height: 1;
+    }
+
+    .cta-inner {
+      max-width: 700px;
+      margin: 0 auto;
+      text-align: center;
+      position: relative;
+    }
+
+    .cta-inner .section-label { justify-content: center; }
+    .cta-inner .section-title { font-size: clamp(2rem, 4vw, 3rem); }
+
+    .cta-inner p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin: 16px 0 40px;
+    }
+
+    .cta-btns {
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .free-badge {
+      display: inline-block;
+      background: rgba(34,197,94,0.15);
+      border: 1px solid rgba(34,197,94,0.3);
+      color: var(--green2);
+      font-size: 0.78rem;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 6px 14px;
+      border-radius: 50px;
+      margin-bottom: 16px;
+    }
+
+    /* ─── CONTACT / FOOTER ─── */
+    #contact {
+      padding: 80px 40px 40px;
+      background: var(--navy);
+      border-top: 1px solid var(--glass-border);
+    }
+
+    .contact-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1.2fr 1fr;
+      gap: 80px;
+    }
+
+    .contact-left h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 900;
+      margin-bottom: 12px;
+    }
+    .contact-left p {
+      color: var(--text-muted);
+      line-height: 1.7;
+      margin-bottom: 32px;
+    }
+
+    .contact-items {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 16px 20px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      text-decoration: none;
+      color: var(--white);
+      transition: all 0.2s;
+    }
+    .contact-item:hover { border-color: var(--gold); transform: translateX(4px); }
+
+    .contact-item-icon {
+      width: 40px; height: 40px;
+      border-radius: 10px;
+      background: rgba(240,180,41,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      flex-shrink: 0;
+    }
+    .contact-item-text h4 {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .contact-item-text p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin: 0;
+    }
+
+    .contact-form {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .form-group label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      border-radius: 10px;
+      padding: 12px 16px;
+      color: var(--white);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus { border-color: var(--gold); }
+    .form-group textarea { resize: vertical; min-height: 100px; }
+    .form-group select { cursor: pointer; }
+    .form-group select option { background: var(--navy2); }
+
+    .footer-bottom {
+      max-width: 1200px;
+      margin: 60px auto 0;
+      padding-top: 24px;
+      border-top: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-logo {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.2rem;
+      font-weight: 900;
+      color: var(--gold);
+    }
+    .footer-logo span { color: var(--white); }
+
+    .footer-copy {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .social-links {
+      display: flex;
+      gap: 12px;
+    }
+
+    .social-link {
+      width: 36px; height: 36px;
+      border-radius: 8px;
+      background: var(--glass);
+      border: 1px solid var(--glass-border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: var(--text-muted);
+      transition: all 0.2s;
+    }
+    .social-link:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+    /* ─── FLOATING PIECES DECORATION ─── */
+    .float-piece {
+      position: absolute;
+      font-size: var(--size, 2rem);
+      opacity: var(--opacity, 0.06);
+      animation: floatAround var(--duration, 10s) ease-in-out infinite;
+      animation-delay: var(--delay, 0s);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    @keyframes floatAround {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      33% { transform: translateY(-20px) rotate(5deg); }
+      66% { transform: translateY(10px) rotate(-3deg); }
+    }
+
+    /* ─── SCROLL ANIMATIONS ─── */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .fade-left {
+      opacity: 0;
+      transform: translateX(-40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-left.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .fade-right {
+      opacity: 0;
+      transform: translateX(40px);
+      transition: opacity 0.7s ease, transform 0.7s ease;
+    }
+    .fade-right.visible {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .delay-1 { transition-delay: 0.1s; }
+    .delay-2 { transition-delay: 0.2s; }
+    .delay-3 { transition-delay: 0.3s; }
+    .delay-4 { transition-delay: 0.4s; }
+    .delay-5 { transition-delay: 0.5s; }
+
+    /* ─── SCROLL TO TOP ─── */
+    #scroll-top {
+      position: fixed;
+      bottom: 30px;
+      right: 30px;
+      z-index: 999;
+      width: 46px; height: 46px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--gold), #e09800);
+      color: var(--navy);
+      font-size: 1.1rem;
+      border: none;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 25px rgba(240,180,41,0.3);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+    }
+    #scroll-top.visible { opacity: 1; transform: translateY(0); }
+    #scroll-top:hover { transform: translateY(-3px); box-shadow: 0 12px 35px rgba(240,180,41,0.5); }
+
+    /* ─── MOBILE NAV OVERLAY ─── */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(5,13,26,0.97);
+      z-index: 999;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 32px;
+      backdrop-filter: blur(20px);
+    }
+    .mobile-nav.open { display: flex; }
+    .mobile-nav a {
+      color: var(--white);
+      text-decoration: none;
+      font-size: 1.5rem;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      transition: color 0.2s;
+    }
+    .mobile-nav a:hover { color: var(--gold); }
+
+    .mobile-nav-close {
+      position: absolute;
+      top: 24px; right: 28px;
+      background: none;
+      border: none;
+      color: var(--white);
+      font-size: 1.8rem;
+      cursor: pointer;
+    }
+
+    /* ─── MEDIA QUERIES ─── */
+    @media (max-width: 1024px) {
+      .benefits-grid { grid-template-columns: repeat(2, 1fr); }
+      .programs-grid { grid-template-columns: 1fr 1fr; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); gap: 32px; }
+    }
+
+    @media (max-width: 768px) {
+      nav { padding: 16px 24px; }
+      .nav-links { display: none; }
+      .hamburger { display: flex; }
+
+      #hero { padding: 100px 24px 60px; }
+      .hero-inner {
+        grid-template-columns: 1fr;
+        gap: 48px;
+        text-align: center;
+      }
+      .hero-title { font-size: 2.5rem; }
+      .hero-subtitle { margin: 0 auto 36px; }
+      .hero-btns { justify-content: center; }
+      .hero-stats { justify-content: center; }
+      .hero-visual { justify-content: center; }
+      .chess-scene { width: 280px; height: 280px; }
+      .board-grid { width: 220px; height: 220px; }
+      .piece-on-board { font-size: 1.8rem; }
+
+      #about { padding: 60px 24px; }
+      .about-inner { grid-template-columns: 1fr; gap: 48px; }
+      .about-photos { height: 340px; }
+      .photo-main { width: 220px; height: 280px; }
+      .photo-secondary { width: 150px; height: 190px; }
+      .photo-action { width: 120px; height: 120px; }
+      .achievements-grid { grid-template-columns: 1fr; }
+
+      #why-chess { padding: 60px 24px; }
+      .benefits-grid { grid-template-columns: 1fr; }
+
+      #programs { padding: 60px 24px; }
+      .programs-grid { grid-template-columns: 1fr; }
+
+      #stats { padding: 60px 24px; }
+      .stats-inner { grid-template-columns: repeat(2, 1fr); }
+      .stat-num { font-size: 2.5rem; }
+
+      #testimonials { padding: 60px 24px; }
+
+      #how-it-works { padding: 60px 24px; }
+
+      #cta { padding: 60px 24px; }
+      .cta-bg-piece { font-size: 10rem; }
+
+      #contact { padding: 60px 24px 32px; }
+      .contact-inner { grid-template-columns: 1fr; gap: 48px; }
+      .form-row { grid-template-columns: 1fr; }
+
+      .footer-bottom { flex-direction: column; text-align: center; }
+    }
+
+    @media (max-width: 480px) {
+      .hero-stats { gap: 20px; }
+      .stat-num { font-size: 2rem; }
+      .chess-scene { width: 240px; height: 240px; }
+      .board-grid { width: 180px; height: 180px; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─── CANVAS BACKGROUND ─── -->
+<canvas id="bg-canvas"></canvas>
+
+<!-- ─── SCROLL TO TOP ─── -->
+<button id="scroll-top" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Scroll to top">↑</button>
+
+<!-- ─── MOBILE NAV ─── -->
+<div class="mobile-nav" id="mobile-nav">
+  <button class="mobile-nav-close" id="mobile-close">✕</button>
+  <a href="#about" onclick="closeMobileNav()">About</a>
+  <a href="#why-chess" onclick="closeMobileNav()">Why Chess</a>
+  <a href="#programs" onclick="closeMobileNav()">Programs</a>
+  <a href="#testimonials" onclick="closeMobileNav()">Reviews</a>
+  <a href="#contact" onclick="closeMobileNav()">Contact</a>
+  <a href="#contact" class="btn-primary" style="font-size:1rem;padding:14px 32px;" onclick="closeMobileNav()">Book Free Trial</a>
+</div>
+
+<!-- ─── NAVIGATION ─── -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">♛ <span>Hari</span>krishnan</a>
+  <ul class="nav-links">
+    <li><a href="#about">About</a></li>
+    <li><a href="#why-chess">Why Chess</a></li>
+    <li><a href="#programs">Programs</a></li>
+    <li><a href="#testimonials">Reviews</a></li>
+    <li><a href="#contact">Contact</a></li>
+    <li><a href="#contact" class="nav-cta">Book Free Trial</a></li>
+  </ul>
+  <div class="hamburger" id="hamburger">
+    <span></span><span></span><span></span>
+  </div>
+</nav>
+
+<!-- ─── HERO ─── -->
+<section id="hero">
+  <!-- Decorative floating pieces -->
+  <span class="float-piece" style="top:15%;left:5%;--size:3rem;--opacity:0.07;--duration:12s;--delay:0s;">♖</span>
+  <span class="float-piece" style="top:70%;left:8%;--size:2rem;--opacity:0.06;--duration:9s;--delay:2s;">♘</span>
+  <span class="float-piece" style="top:20%;right:8%;--size:2.5rem;--opacity:0.07;--duration:11s;--delay:1s;">♗</span>
+  <span class="float-piece" style="top:75%;right:5%;--size:3rem;--opacity:0.06;--duration:14s;--delay:3s;">♙</span>
+  <span class="float-piece" style="top:45%;left:2%;--size:1.8rem;--opacity:0.05;--duration:8s;--delay:1.5s;">♕</span>
+
+  <div class="hero-inner">
+    <div class="hero-content fade-left">
+      <div class="hero-badge">
+        ♞ &nbsp; FIDE Rated Chess Coach &nbsp; · &nbsp; 6+ Years Experience
+      </div>
+      <h1 class="hero-title">
+        Master the<br/>
+        <span class="gold">Art of Chess.</span><br/>
+        <span class="outline">Transform</span> Your Mind.
+      </h1>
+      <p class="hero-subtitle">
+        From absolute beginners to competitive players — I craft personalised coaching journeys that build tactical brilliance, strategic thinking, and the mental discipline that chess (and life) demands.
+      </p>
+      <div class="hero-btns">
+        <a href="#contact" class="btn-primary">
+          ♟ Book Free Trial Class
+        </a>
+        <a href="#programs" class="btn-secondary">
+          View Programs →
+        </a>
+      </div>
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <span class="stat-num counter" data-target="500">0</span>
+          <span class="hero-stat-label">Students Trained</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-num counter" data-target="6">0</span>
+          <span class="hero-stat-label">Years Coaching</span>
+        </div>
+        <div class="hero-stat">
+          <span class="stat-num counter" data-target="100">0</span>
+          <span class="hero-stat-label">FIDE Rated Players</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3D Chess Board Visual -->
+    <div class="hero-visual fade-right">
+      <div class="chess-scene">
+        <!-- Glow rings -->
+        <div class="glow-ring"></div>
+        <div class="glow-ring"></div>
+
+        <!-- Orbiting pieces -->
+        <div class="orbit-container">
+          <span class="orbit-piece" style="--start-angle:0deg;--radius:170px;animation-duration:8s;">♜</span>
+          <span class="orbit-piece" style="--start-angle:72deg;--radius:170px;animation-duration:8s;">♞</span>
+          <span class="orbit-piece" style="--start-angle:144deg;--radius:170px;animation-duration:8s;">♝</span>
+          <span class="orbit-piece" style="--start-angle:216deg;--radius:170px;animation-duration:8s;">♛</span>
+          <span class="orbit-piece" style="--start-angle:288deg;--radius:170px;animation-duration:8s;">♟</span>
+        </div>
+
+        <div class="chess-board-3d">
+          <div class="board-grid" id="chess-board"></div>
+          <span class="piece-on-board">♚</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── ABOUT ─── -->
+<section id="about">
+  <div class="about-inner">
+    <div class="about-photos fade-left">
+      <!-- Casual photo (photo1.jpg) — main large card -->
+      <img class="photo-main" src="photo1.jpg" alt="Harikrishnan Chess Coach - Casual"
+           onerror="this.outerHTML='<div class=\'photo-main\' style=\'background:linear-gradient(135deg,#0f1e35,#1a2e48);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:10px;\'><span style=\'font-size:5rem;\'>♟</span><span style=\'color:#8fa3bf;font-size:0.8rem;\'>Coach Photo</span></div>'" />
+
+      <!-- Formal suit photo (photo2.jpg) — bottom right card -->
+      <img class="photo-secondary" src="photo2.jpg" alt="Harikrishnan Chess Coach - Professional"
+           onerror="this.outerHTML='<div class=\'photo-secondary\' style=\'background:linear-gradient(135deg,#0f2820,#0a1f17);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:8px;\'><span style=\'font-size:3rem;\'>♜</span></div>'" />
+
+      <!-- Chess action photo (photo3.jpg) — circle overlay -->
+      <img class="photo-action" src="photo3.jpg" alt="Harikrishnan Playing Chess"
+           onerror="this.outerHTML='<div class=\'photo-action\' style=\'background:linear-gradient(135deg,#1e1a06,#2e2710);display:flex;align-items:center;justify-content:center;font-size:2.5rem;\'>♞</div>'" />
+
+      <div class="photo-badge">
+        🏆 &nbsp; FIDE Rated Coach
+      </div>
+    </div>
+
+    <div class="about-content fade-right">
+      <div class="section-label">About Me</div>
+      <h2 class="section-title">Your Move to a <span class="gold">Grandmaster Mindset</span> Starts Here</h2>
+      <p class="about-bio">
+        I'm <strong>Harikrishnan</strong>, a passionate FIDE-rated chess coach with over <strong>6 years</strong> of experience transforming players of all ages — from curious 5-year-olds to sharp seniors — into confident, rated competitors.
+        <br/><br/>
+        Chess isn't just a game to me — it's a lifelong teacher of patience, strategic thinking, and resilience. My coaching blends deep theoretical knowledge with practical over-the-board experience, tailored uniquely to every student's pace and goals.
+      </p>
+
+      <div class="achievements-grid">
+        <div class="achievement-card fade-up delay-1">
+          <span class="achievement-icon">🎓</span>
+          <div class="achievement-text">
+            <h4>FIDE Rated</h4>
+            <p>Internationally recognised rating from FIDE</p>
+          </div>
+        </div>
+        <div class="achievement-card fade-up delay-2">
+          <span class="achievement-icon">👨‍🎓</span>
+          <div class="achievement-text">
+            <h4>500+ Students</h4>
+            <p>Across all age groups &amp; skill levels</p>
+          </div>
+        </div>
+        <div class="achievement-card fade-up delay-3">
+          <span class="achievement-icon">🏅</span>
+          <div class="achievement-text">
+            <h4>100+ FIDE Players</h4>
+            <p>Students who earned their FIDE rating</p>
+          </div>
+        </div>
+        <div class="achievement-card fade-up delay-4">
+          <span class="achievement-icon">⭐</span>
+          <div class="achievement-text">
+            <h4>6 Years Teaching</h4>
+            <p>Kids, teens, adults &amp; senior citizens</p>
+          </div>
+        </div>
+      </div>
+
+      <a href="#contact" class="btn-primary" style="display:inline-flex;">
+        ♟ Start Learning Today
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── WHY CHESS ─── -->
+<section id="why-chess">
+  <div class="why-inner">
+    <div class="why-header fade-up">
+      <div class="section-label">Benefits</div>
+      <h2 class="section-title">Why Every Child <span class="gold">Deserves Chess</span></h2>
+      <p class="section-desc">Chess is the ultimate brain workout — scientifically proven to sharpen cognition, boost academic performance, and build character that lasts a lifetime.</p>
+    </div>
+
+    <div class="benefits-grid">
+      <div class="benefit-card fade-up delay-1">
+        <div class="benefit-icon-wrap">🧠</div>
+        <h3>Boosts Brainpower</h3>
+        <p>Chess activates both brain hemispheres simultaneously, building memory, concentration, and creative problem-solving that transfers directly to academics.</p>
+        <span class="benefit-bg-piece">♟</span>
+      </div>
+      <div class="benefit-card fade-up delay-2">
+        <div class="benefit-icon-wrap">📚</div>
+        <h3>Academic Excellence</h3>
+        <p>Studies show chess players consistently achieve higher scores in Maths, Reading, and Science. The discipline of chess becomes a discipline for life.</p>
+        <span class="benefit-bg-piece">♜</span>
+      </div>
+      <div class="benefit-card fade-up delay-3">
+        <div class="benefit-icon-wrap">🎯</div>
+        <h3>Strategic Thinking</h3>
+        <p>Learn to think 5 moves ahead. Chess trains long-term planning, consequence analysis, and the art of turning disadvantage into opportunity.</p>
+        <span class="benefit-bg-piece">♝</span>
+      </div>
+      <div class="benefit-card fade-up delay-4">
+        <div class="benefit-icon-wrap">🏆</div>
+        <h3>Competitive Edge</h3>
+        <p>Earn your FIDE rating and compete nationally and internationally. Chess opens doors to tournaments, scholarships, and a global community.</p>
+        <span class="benefit-bg-piece">♛</span>
+      </div>
+      <div class="benefit-card fade-up delay-3">
+        <div class="benefit-icon-wrap">🧘</div>
+        <h3>Emotional Resilience</h3>
+        <p>Learn to handle wins gracefully and losses constructively. Chess builds emotional intelligence, patience, and the mental toughness to never give up.</p>
+        <span class="benefit-bg-piece">♞</span>
+      </div>
+      <div class="benefit-card fade-up delay-4">
+        <div class="benefit-icon-wrap">🌐</div>
+        <h3>Global Community</h3>
+        <p>Chess is a universal language spoken in 172 countries. Join a worldwide network of thinkers, strategists, and lifelong learners at any age.</p>
+        <span class="benefit-bg-piece">♚</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── STATS ─── -->
+<section id="stats">
+  <div class="stats-inner">
+    <div class="stat-item fade-up delay-1">
+      <span class="stat-num counter" data-target="500">0</span>
+      <span class="stat-label">Students Taught</span>
+    </div>
+    <div class="stat-item fade-up delay-2">
+      <span class="stat-num counter" data-target="6">0</span>
+      <span class="stat-label">Years Experience</span>
+    </div>
+    <div class="stat-item fade-up delay-3">
+      <span class="stat-num counter" data-target="100">0</span>
+      <span class="stat-label">FIDE Rated Players</span>
+    </div>
+    <div class="stat-item fade-up delay-4">
+      <span class="stat-num" data-target="100">4.9★</span>
+      <span class="stat-label">Average Rating</span>
+    </div>
+  </div>
+</section>
+
+<!-- ─── PROGRAMS ─── -->
+<section id="programs">
+  <div class="programs-inner">
+    <div class="programs-header fade-up">
+      <div class="section-label">Programs</div>
+      <h2 class="section-title">Find Your <span class="gold">Perfect Program</span></h2>
+      <p class="section-desc">Structured learning paths designed for every level — from those who've never touched a chess piece to players chasing their FIDE title.</p>
+    </div>
+
+    <div class="programs-grid">
+      <div class="program-card fade-up delay-1">
+        <div class="program-icon">♙</div>
+        <div class="program-level">Beginner</div>
+        <h3>Pawn to Player</h3>
+        <p class="program-desc">A fun, engaging introduction to chess for absolute beginners. Learn all the rules, basic tactics, and fall in love with the game.</p>
+        <ul class="program-features">
+          <li>All pieces, rules &amp; board setup</li>
+          <li>Basic checkmates &amp; tactics</li>
+          <li>Opening principles</li>
+          <li>Fun puzzles &amp; practice games</li>
+          <li>Suitable for ages 5 and above</li>
+        </ul>
+        <a href="#contact" class="program-cta outline-cta">Get Started →</a>
+      </div>
+
+      <div class="program-card featured fade-up delay-2">
+        <div class="program-badge">Most Popular</div>
+        <div class="program-icon">♞</div>
+        <div class="program-level">Intermediate</div>
+        <h3>Knight's Academy</h3>
+        <p class="program-desc">For players ready to level up. Master complex tactics, deepen your opening repertoire, and start competing in tournaments.</p>
+        <ul class="program-features">
+          <li>Advanced tactics &amp; combinations</li>
+          <li>Opening repertoire building</li>
+          <li>Endgame mastery</li>
+          <li>Tournament preparation</li>
+          <li>Online rated game analysis</li>
+        </ul>
+        <a href="#contact" class="program-cta primary-cta">Enroll Now →</a>
+      </div>
+
+      <div class="program-card fade-up delay-3">
+        <div class="program-icon">♛</div>
+        <div class="program-level">Advanced / FIDE</div>
+        <h3>FIDE Rating Quest</h3>
+        <p class="program-desc">Intensive coaching designed to help competitive players earn and improve their FIDE rating through elite-level preparation.</p>
+        <ul class="program-features">
+          <li>Deep opening theory &amp; preparation</li>
+          <li>Positional &amp; strategic mastery</li>
+          <li>Personalised game analysis</li>
+          <li>FIDE tournament guidance</li>
+          <li>1-on-1 grandmaster-style sessions</li>
+        </ul>
+        <a href="#contact" class="program-cta outline-cta">Apply Now →</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── TESTIMONIALS ─── -->
+<section id="testimonials">
+  <div class="testimonials-inner">
+    <div class="testimonials-header fade-up">
+      <div class="section-label">Reviews</div>
+      <h2 class="section-title">What Our <span class="gold">Students Say</span></h2>
+      <p class="section-desc" style="margin:0 auto;">Real stories from real students and parents who've experienced the transformation firsthand.</p>
+    </div>
+
+    <div style="overflow:hidden;margin-top:48px;">
+      <div class="testimonials-track" id="testimonials-track">
+        <!-- Set 1 -->
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"My son went from knowing nothing about chess to winning his first state-level tournament in just 8 months. Harikrishnan sir's teaching style is incredibly patient and effective!"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">P</div>
+            <div class="author-info"><h4>Priya Sharma</h4><p>Parent · Chennai</p></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"I'm 65 years old and always wanted to learn chess. Sir made it so easy and enjoyable. Now I play with my grandchildren and beat them! 😄"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">R</div>
+            <div class="author-info"><h4>Rajan Pillai</h4><p>Retired Professional · Kochi</p></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Got my FIDE rating within 6 months under his coaching. The strategic insights and game analysis sessions are absolutely gold. Highly recommend!"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">A</div>
+            <div class="author-info"><h4>Arjun Menon</h4><p>FIDE Rated Player · Bangalore</p></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Harikrishnan sir doesn't just teach chess — he teaches you to think. My daughter's concentration in school improved dramatically after just 3 months!"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">D</div>
+            <div class="author-info"><h4>Deepa Nair</h4><p>Parent · Trivandrum</p></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"The online sessions are just as effective as in-person. Flexible timings, personalised feedback, and genuine care for student progress. 10/10!"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">S</div>
+            <div class="author-info"><h4>Siddharth Rao</h4><p>Engineering Student · Hyderabad</p></div>
+          </div>
+        </div>
+        <!-- Set 2 (duplicate for infinite scroll) -->
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"My son went from knowing nothing about chess to winning his first state-level tournament in just 8 months. Harikrishnan sir's teaching style is incredibly patient and effective!"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">P</div>
+            <div class="author-info"><h4>Priya Sharma</h4><p>Parent · Chennai</p></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"I'm 65 years old and always wanted to learn chess. Sir made it so easy and enjoyable. Now I play with my grandchildren and beat them! 😄"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">R</div>
+            <div class="author-info"><h4>Rajan Pillai</h4><p>Retired Professional · Kochi</p></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Got my FIDE rating within 6 months under his coaching. The strategic insights and game analysis sessions are absolutely gold. Highly recommend!"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">A</div>
+            <div class="author-info"><h4>Arjun Menon</h4><p>FIDE Rated Player · Bangalore</p></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"Harikrishnan sir doesn't just teach chess — he teaches you to think. My daughter's concentration in school improved dramatically after just 3 months!"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">D</div>
+            <div class="author-info"><h4>Deepa Nair</h4><p>Parent · Trivandrum</p></div>
+          </div>
+        </div>
+        <div class="testimonial-card">
+          <div class="testimonial-stars">★★★★★</div>
+          <p class="testimonial-text">"The online sessions are just as effective as in-person. Flexible timings, personalised feedback, and genuine care for student progress. 10/10!"</p>
+          <div class="testimonial-author">
+            <div class="author-avatar">S</div>
+            <div class="author-info"><h4>Siddharth Rao</h4><p>Engineering Student · Hyderabad</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── HOW IT WORKS ─── -->
+<section id="how-it-works">
+  <div class="how-inner">
+    <div class="how-header fade-up">
+      <div class="section-label">Process</div>
+      <h2 class="section-title">How <span class="gold">We Work Together</span></h2>
+      <p class="section-desc" style="margin:0 auto;">Simple, structured, and designed around your success. Here's what your chess journey looks like.</p>
+    </div>
+
+    <div class="steps" style="margin-top:56px;">
+      <div class="step fade-up delay-1">
+        <div class="step-left">
+          <div class="step-num">1</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <h3>Free Trial Class</h3>
+          <p>Book a complimentary 45-minute session. We assess your current level, discuss your goals, and make sure we're a perfect fit — zero pressure, zero commitment.</p>
+        </div>
+      </div>
+      <div class="step fade-up delay-2">
+        <div class="step-left">
+          <div class="step-num">2</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <h3>Personalised Learning Plan</h3>
+          <p>Every student receives a custom roadmap — paced learning objectives, a curated opening repertoire, and milestone goals tailored to their unique strengths and weaknesses.</p>
+        </div>
+      </div>
+      <div class="step fade-up delay-3">
+        <div class="step-left">
+          <div class="step-num">3</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <h3>Live Interactive Sessions</h3>
+          <p>Engaging 1-on-1 or group lessons via online/offline mode — combining puzzles, live game analysis, theory, and practical play. Sessions that make you look forward to every class.</p>
+        </div>
+      </div>
+      <div class="step fade-up delay-4">
+        <div class="step-left">
+          <div class="step-num">4</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <h3>Track Progress &amp; Compete</h3>
+          <p>Regular performance reviews, homework assignments, and tournament guidance. Watch your rating climb as you grow from student to confident competitor.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CTA SECTION ─── -->
+<section id="cta">
+  <span class="cta-bg-piece">♛</span>
+  <div class="cta-inner">
+    <div class="free-badge">✓ &nbsp; No credit card required</div>
+    <div class="section-label" style="justify-content:center;">Start Your Journey</div>
+    <h2 class="section-title fade-up">Your First Move is <span class="gold">Always Free</span></h2>
+    <p class="fade-up delay-1">Join 500+ students who've already discovered the power of chess. Book your complimentary trial class today and experience world-class coaching firsthand — absolutely free.</p>
+    <div class="cta-btns fade-up delay-2">
+      <a href="#contact" class="btn-primary">♟ Book Free Trial Now</a>
+      <a href="https://wa.me/919999999999" class="btn-secondary" target="_blank">💬 Chat on WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── CONTACT ─── -->
+<section id="contact">
+  <div class="contact-inner">
+    <div class="contact-left fade-left">
+      <div class="section-label">Get In Touch</div>
+      <h2>Ready to Make <span style="color:var(--gold)">Your Move?</span></h2>
+      <p>Fill out the form and I'll get back to you within 24 hours. Or reach out directly — I love talking chess!</p>
+
+      <div class="contact-items">
+        <a href="https://wa.me/919999999999" class="contact-item" target="_blank">
+          <div class="contact-item-icon">💬</div>
+          <div class="contact-item-text">
+            <h4>WhatsApp</h4>
+            <p>+91 99999 99999 · Fastest response</p>
+          </div>
+        </a>
+        <a href="mailto:coach@harikrishnan.com" class="contact-item">
+          <div class="contact-item-icon">✉️</div>
+          <div class="contact-item-text">
+            <h4>Email</h4>
+            <p>coach@harikrishnan.com</p>
+          </div>
+        </a>
+        <a href="#" class="contact-item">
+          <div class="contact-item-icon">📍</div>
+          <div class="contact-item-text">
+            <h4>Location</h4>
+            <p>Online & In-Person · India</p>
+          </div>
+        </a>
+        <a href="#" class="contact-item">
+          <div class="contact-item-icon">🕐</div>
+          <div class="contact-item-text">
+            <h4>Session Hours</h4>
+            <p>Mon–Sat · 6:00 AM – 9:00 PM IST</p>
+          </div>
+        </a>
+      </div>
+    </div>
+
+    <div class="contact-form fade-right">
+      <div class="form-row">
+        <div class="form-group">
+          <label>First Name</label>
+          <input type="text" placeholder="Arjun" />
+        </div>
+        <div class="form-group">
+          <label>Last Name</label>
+          <input type="text" placeholder="Nair" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email Address</label>
+        <input type="email" placeholder="arjun@email.com" />
+      </div>
+      <div class="form-group">
+        <label>Phone / WhatsApp</label>
+        <input type="tel" placeholder="+91 98765 43210" />
+      </div>
+      <div class="form-group">
+        <label>Who is learning?</label>
+        <select>
+          <option>Myself (Adult)</option>
+          <option>My Child (5–12 years)</option>
+          <option>My Teenager (13–18 years)</option>
+          <option>Senior / Retired</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Current Level</label>
+        <select>
+          <option>Complete Beginner</option>
+          <option>Know the Basics</option>
+          <option>Intermediate Player</option>
+          <option>Competitive / Tournament Player</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Message (Optional)</label>
+        <textarea placeholder="Tell me about your chess goals or any questions you have..."></textarea>
+      </div>
+      <button type="submit" class="btn-primary" style="width:100%;justify-content:center;font-size:1rem;" onclick="handleFormSubmit(event)">
+        ♟ Book My Free Trial Class
+      </button>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <div class="footer-logo">♛ <span>Hari</span>krishnan Chess Academy</div>
+    <p class="footer-copy">© 2025 Harikrishnan Chess Academy · All rights reserved · Made with ♟ and passion</p>
+    <div class="social-links">
+      <a href="#" class="social-link" title="Instagram">📷</a>
+      <a href="#" class="social-link" title="YouTube">▶️</a>
+      <a href="#" class="social-link" title="Facebook">f</a>
+      <a href="#" class="social-link" title="Chess.com">♟</a>
+    </div>
+  </div>
+</section>
+
+<!-- ─── JAVASCRIPT ─── -->
+<script>
+  // ─── Build chess board ───
+  const board = document.getElementById('chess-board');
+  if (board) {
+    for (let r = 0; r < 8; r++) {
+      for (let c = 0; c < 8; c++) {
+        const cell = document.createElement('div');
+        cell.className = 'board-cell ' + ((r + c) % 2 === 0 ? 'light' : 'dark');
+        board.appendChild(cell);
+      }
+    }
+  }
+
+  // ─── Canvas particle system ───
+  const canvas = document.getElementById('bg-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resizeCanvas() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  const PIECES = ['♙','♟','♜','♖','♝','♞','♛','♚'];
+  const particles = [];
+
+  class Particle {
+    constructor() {
+      this.reset();
+    }
+    reset() {
+      this.x = Math.random() * canvas.width;
+      this.y = Math.random() * canvas.height;
+      this.size = Math.random() * 16 + 8;
+      this.speedX = (Math.random() - 0.5) * 0.3;
+      this.speedY = -(Math.random() * 0.4 + 0.1);
+      this.opacity = Math.random() * 0.06 + 0.02;
+      this.piece = PIECES[Math.floor(Math.random() * PIECES.length)];
+      this.rotation = Math.random() * Math.PI * 2;
+      this.rotSpeed = (Math.random() - 0.5) * 0.005;
+    }
+    update() {
+      this.x += this.speedX;
+      this.y += this.speedY;
+      this.rotation += this.rotSpeed;
+      if (this.y < -40 || this.x < -40 || this.x > canvas.width + 40) this.reset();
+    }
+    draw() {
+      ctx.save();
+      ctx.translate(this.x, this.y);
+      ctx.rotate(this.rotation);
+      ctx.globalAlpha = this.opacity;
+      ctx.fillStyle = '#f0b429';
+      ctx.font = `${this.size}px serif`;
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(this.piece, 0, 0);
+      ctx.restore();
+    }
+  }
+
+  for (let i = 0; i < 40; i++) {
+    const p = new Particle();
+    p.y = Math.random() * canvas.height; // random start y
+    particles.push(p);
+  }
+
+  // Grid lines
+  function drawGrid() {
+    ctx.strokeStyle = 'rgba(240,180,41,0.025)';
+    ctx.lineWidth = 1;
+    const spacing = 60;
+    for (let x = 0; x < canvas.width; x += spacing) {
+      ctx.beginPath();
+      ctx.moveTo(x, 0);
+      ctx.lineTo(x, canvas.height);
+      ctx.stroke();
+    }
+    for (let y = 0; y < canvas.height; y += spacing) {
+      ctx.beginPath();
+      ctx.moveTo(0, y);
+      ctx.lineTo(canvas.width, y);
+      ctx.stroke();
+    }
+  }
+
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    drawGrid();
+    particles.forEach(p => { p.update(); p.draw(); });
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  // ─── Nav scroll ───
+  const navbar = document.getElementById('navbar');
+  const scrollTopBtn = document.getElementById('scroll-top');
+
+  window.addEventListener('scroll', () => {
+    if (window.scrollY > 50) {
+      navbar.classList.add('scrolled');
+      scrollTopBtn.classList.add('visible');
+    } else {
+      navbar.classList.remove('scrolled');
+      scrollTopBtn.classList.remove('visible');
+    }
+  });
+
+  // ─── Mobile nav ───
+  const hamburger = document.getElementById('hamburger');
+  const mobileNav = document.getElementById('mobile-nav');
+  const mobileClose = document.getElementById('mobile-close');
+
+  hamburger.addEventListener('click', () => {
+    hamburger.classList.toggle('open');
+    mobileNav.classList.toggle('open');
+  });
+  mobileClose.addEventListener('click', () => closeMobileNav());
+
+  function closeMobileNav() {
+    hamburger.classList.remove('open');
+    mobileNav.classList.remove('open');
+  }
+
+  // ─── Intersection Observer for animations ───
+  const animEls = document.querySelectorAll('.fade-up, .fade-left, .fade-right');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+  animEls.forEach(el => observer.observe(el));
+
+  // ─── Counter animation ───
+  const counters = document.querySelectorAll('.counter');
+  const counterObserver = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting && !entry.target.dataset.done) {
+        entry.target.dataset.done = 'true';
+        const target = parseInt(entry.target.dataset.target);
+        const duration = 1800;
+        const start = performance.now();
+        function tick(now) {
+          const elapsed = now - start;
+          const progress = Math.min(elapsed / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          const current = Math.round(eased * target);
+          entry.target.textContent = current + (target >= 100 ? '+' : '');
+          if (progress < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+      }
+    });
+  }, { threshold: 0.5 });
+
+  counters.forEach(c => counterObserver.observe(c));
+
+  // ─── Mouse parallax on hero chess scene ───
+  const chessScene = document.querySelector('.chess-scene');
+  document.addEventListener('mousemove', (e) => {
+    if (!chessScene) return;
+    const rect = chessScene.getBoundingClientRect();
+    const cx = rect.left + rect.width / 2;
+    const cy = rect.top + rect.height / 2;
+    const dx = (e.clientX - cx) / window.innerWidth;
+    const dy = (e.clientY - cy) / window.innerHeight;
+    const board3d = chessScene.querySelector('.chess-board-3d');
+    if (board3d) {
+      board3d.style.transform = `rotateX(${25 - dy * 10}deg) rotateY(${-15 + dx * 15}deg)`;
+    }
+  });
+
+  // ─── Form submit ───
+  function handleFormSubmit(e) {
+    e.preventDefault();
+    const btn = e.target;
+    const original = btn.innerHTML;
+    btn.innerHTML = '✓ &nbsp; Message Sent! I\'ll reach out soon.';
+    btn.style.background = 'linear-gradient(135deg,#22c55e,#16a34a)';
+    btn.disabled = true;
+    setTimeout(() => {
+      btn.innerHTML = original;
+      btn.style.background = '';
+      btn.disabled = false;
+    }, 4000);
+  }
+
+  // ─── Smooth active nav link ───
+  const sections = document.querySelectorAll('section[id]');
+  const navLinks = document.querySelectorAll('.nav-links a');
+
+  window.addEventListener('scroll', () => {
+    let current = '';
+    sections.forEach(s => {
+      if (window.scrollY >= s.offsetTop - 120) current = s.id;
+    });
+    navLinks.forEach(a => {
+      a.style.color = a.getAttribute('href') === '#' + current ? 'var(--gold)' : '';
+    });
+  });
+
+  // Trigger hero animations immediately
+  document.querySelectorAll('.fade-left, .fade-right, .fade-up').forEach(el => {
+    const rect = el.getBoundingClientRect();
+    if (rect.top < window.innerHeight) el.classList.add('visible');
+  });
+</script>
+
+</body>
+</html>
