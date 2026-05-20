@@ -52,17 +52,24 @@ body.cursor-btn #cursor-outer{width:52px;height:52px;background:rgba(240,180,41,
   transition:opacity .8s var(--ease),visibility .8s;
 }
 #preloader.done{opacity:0;visibility:hidden;pointer-events:none;}
-.pre-board{
-  display:grid;grid-template-columns:repeat(4,1fr);
-  width:120px;height:120px;border:2px solid var(--gold);
-  border-radius:8px;overflow:hidden;
-  box-shadow:0 0 60px rgba(240,180,41,0.3);
-  animation:preSpin 2s var(--ease) infinite;
+.pre-photo{
+  width:130px;height:130px;border-radius:50%;overflow:hidden;
+  border:3px solid var(--gold);
+  box-shadow:0 0 0 6px rgba(240,180,41,0.12),0 0 60px rgba(240,180,41,0.35);
+  animation:prePhotoGlow 2.5s ease-in-out infinite;
+  flex-shrink:0;
 }
-@keyframes preSpin{0%,100%{transform:rotate(0deg) scale(1);}50%{transform:rotate(180deg) scale(1.05);}}
-.pre-cell{aspect-ratio:1;}
-.pre-cell.l{background:#f0d9b5;}
-.pre-cell.d{background:#b58863;}
+.pre-photo img{width:100%;height:100%;object-fit:cover;object-position:top center;}
+.pre-photo-fallback{
+  width:100%;height:100%;
+  background:linear-gradient(135deg,#0f1e35,#1a2e48);
+  display:flex;align-items:center;justify-content:center;
+  font-size:3rem;
+}
+@keyframes prePhotoGlow{
+  0%,100%{box-shadow:0 0 0 6px rgba(240,180,41,0.12),0 0 50px rgba(240,180,41,0.3);transform:scale(1);}
+  50%{box-shadow:0 0 0 10px rgba(240,180,41,0.18),0 0 80px rgba(240,180,41,0.5);transform:scale(1.04);}
+}
 .pre-text{
   font-family:'Playfair Display',serif;font-size:1.1rem;color:var(--gold);
   letter-spacing:4px;text-transform:uppercase;opacity:0;
@@ -931,7 +938,10 @@ section{position:relative;z-index:1;}
 
 <!-- PRELOADER -->
 <div id="preloader">
-  <div class="pre-board" id="pre-board"></div>
+  <div class="pre-photo">
+    <img src="photo2.jpg" alt="Harikrishnan" onerror="this.style.display='none';this.nextElementSibling.style.display='flex'"/>
+    <div class="pre-photo-fallback" style="display:none">♚</div>
+  </div>
   <div class="pre-text">KRISH CHESS ACADEMY</div>
   <div class="pre-bar"><div class="pre-fill" id="pre-fill"></div></div>
 </div>
@@ -1408,14 +1418,6 @@ section{position:relative;z-index:1;}
    PRELOADER
 ══════════════════════════════════════ */
 (function(){
-  const board=document.getElementById('pre-board');
-  if(board){
-    for(let i=0;i<16;i++){
-      const c=document.createElement('div');
-      c.className='pre-cell '+((Math.floor(i/4)+i)%2===0?'l':'d');
-      board.appendChild(c);
-    }
-  }
   const fill=document.getElementById('pre-fill');
   const pre=document.getElementById('preloader');
   setTimeout(()=>{if(fill)fill.style.width='100%';},100);
