@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Harikrishnan | FIDE Rated Chess Coach</title>
-<meta name="description" content="FIDE-rated chess coach with 6+ years transforming beginners into rated players."/>
+<title>Krish Chess Academy | FIDE Rated Online Chess Coach</title>
+<meta name="description" content="Krish Chess Academy — FIDE-rated online chess coach with 6+ years transforming beginners into rated players."/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,700&family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;700&display=swap" rel="stylesheet"/>
@@ -208,9 +208,14 @@ nav.scrolled{padding:16px 60px;}
   font-weight:900;line-height:1.05;margin-bottom:28px;
 }
 .hero-title .gold{color:var(--gold);}
-.hero-title .stroke{
-  -webkit-text-stroke:1.5px var(--gold);color:transparent;
+.hero-title .grad{
+  background:linear-gradient(90deg,var(--gold),var(--gold2),#fff8dc,var(--gold));
+  background-size:300% auto;
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:shimmerText 4s linear infinite;
 }
+@keyframes shimmerText{to{background-position:300% center;}}
 
 .hero-sub{
   font-size:1.05rem;color:var(--muted);line-height:1.75;
@@ -328,9 +333,54 @@ nav.scrolled{padding:16px 60px;}
     0 0 0 1px rgba(240,180,41,0.3),
     inset 0 0 30px rgba(0,0,0,0.4);
 }
-.bc{aspect-ratio:1;}
-.bc.l{background:#e8c99a;}
-.bc.d{background:#9e6b3a;}
+.bc{aspect-ratio:1;position:relative;transition:background .3s;}
+.bc.l{background:#f0d9b5;}
+.bc.d{background:#7c4222;}
+.bc.sq-hi{background:rgba(240,180,41,0.55)!important;}
+
+/* board frame */
+.board-surface{
+  border:3px solid #5a2e0e!important;
+  box-shadow:
+    0 0 0 3px var(--gold),
+    0 40px 80px rgba(0,0,0,0.9),
+    inset 0 0 20px rgba(0,0,0,0.5)!important;
+}
+
+/* chess piece layer */
+.chp{
+  position:absolute;width:12.5%;height:12.5%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:clamp(0.9rem,2.2vw,1.55rem);
+  transition:left .75s cubic-bezier(0.16,1,0.3,1),top .75s cubic-bezier(0.16,1,0.3,1),
+             transform .2s,filter .2s;
+  z-index:5;user-select:none;
+}
+.chp-w{
+  color:#fdf6e3;
+  filter:drop-shadow(0 2px 4px rgba(0,0,0,0.9)) drop-shadow(0 0 6px rgba(240,180,41,0.4));
+}
+.chp-b{
+  color:#0a0604;
+  filter:drop-shadow(0 2px 4px rgba(240,180,41,0.15)) drop-shadow(0 0 1px rgba(255,255,255,0.6));
+}
+.chp.moving{
+  filter:drop-shadow(0 8px 16px rgba(240,180,41,0.6));
+  transform:scale(1.12) translateZ(10px);
+  z-index:10;
+}
+
+/* benefit card stat counter */
+.ben-stat{
+  margin-top:20px;padding-top:16px;
+  border-top:1px solid rgba(240,180,41,0.1);
+  display:flex;align-items:baseline;gap:6px;
+}
+.ben-num{
+  font-family:'Playfair Display',serif;font-size:2rem;
+  font-weight:900;color:var(--gold);line-height:1;
+}
+.ben-stat-label{font-size:.68rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;}
 
 /* board edge (3D depth) */
 .board-edge-b{
@@ -882,7 +932,7 @@ section{position:relative;z-index:1;}
 <!-- PRELOADER -->
 <div id="preloader">
   <div class="pre-board" id="pre-board"></div>
-  <div class="pre-text">Harikrishnan Chess Academy</div>
+  <div class="pre-text">KRISH CHESS ACADEMY</div>
   <div class="pre-bar"><div class="pre-fill" id="pre-fill"></div></div>
 </div>
 
@@ -902,7 +952,7 @@ section{position:relative;z-index:1;}
 
 <!-- NAV -->
 <nav id="navbar">
-  <a href="#" class="nav-logo mag">♛ <span>Hari</span>krishnan</a>
+  <a href="#" class="nav-logo mag">♛ <span>Krish</span> Chess Academy</a>
   <ul class="nav-links">
     <li><a href="#about">About</a></li>
     <li><a href="#why">Why Chess</a></li>
@@ -932,7 +982,7 @@ section{position:relative;z-index:1;}
       <h1 class="hero-title" id="hero-title">
         <div class="split-word">Master&nbsp;the</div><br/>
         <div class="split-word gold">Art&nbsp;of&nbsp;Chess.</div><br/>
-        <div class="split-word stroke">Transform</div>&nbsp;<div class="split-word">Your&nbsp;Mind.</div>
+        <div class="split-word grad">Transform</div>&nbsp;<div class="split-word">Your&nbsp;Mind.</div>
       </h1>
 
       <p class="hero-sub" id="hero-sub">
@@ -946,7 +996,7 @@ section{position:relative;z-index:1;}
 
       <div class="hero-stats" id="hero-stats">
         <div class="hero-stat">
-          <span class="h-stat-num counter" data-target="500" data-suffix="+">0</span>
+          <span class="h-stat-num counter" data-target="75" data-suffix="+">0</span>
           <span class="h-stat-label">Students Trained</span>
         </div>
         <div class="hero-stat">
@@ -954,7 +1004,7 @@ section{position:relative;z-index:1;}
           <span class="h-stat-label">Years Coaching</span>
         </div>
         <div class="hero-stat">
-          <span class="h-stat-num counter" data-target="100" data-suffix="+">0</span>
+          <span class="h-stat-num counter" data-target="20" data-suffix="+">0</span>
           <span class="h-stat-label">FIDE Rated Players</span>
         </div>
       </div>
@@ -1023,13 +1073,13 @@ section{position:relative;z-index:1;}
         <div class="sec-label">About Me</div>
         <h2 class="sec-title">Your Move to a <span class="gold">Grandmaster Mindset</span> Starts Here</h2>
         <p class="about-bio">
-          I'm <strong>Harikrishnan</strong>, a passionate FIDE-rated chess coach with over <strong>6 years</strong> of experience transforming players of all ages — from curious 5-year-olds to sharp seniors — into confident, rated competitors.<br/><br/>
-          Chess isn't just a game to me — it's a lifelong teacher of patience, strategic thinking, and resilience. My coaching blends deep theoretical knowledge with practical over-the-board experience, tailored uniquely to every student's pace and goals.
+          I'm <strong>Harikrishnan</strong>, founder of <strong>Krish Chess Academy</strong> — a passionate FIDE-rated chess coach with over <strong>6 years</strong> of experience transforming players of all ages — from curious 5-year-olds to sharp seniors — into confident, rated competitors.<br/><br/>
+          Chess isn't just a game to me — it's a lifelong teacher of patience, strategic thinking, and resilience. My <strong>online coaching</strong> blends deep theoretical knowledge with practical game analysis, tailored uniquely to every student's pace and goals.
         </p>
         <div class="ach-grid">
           <div class="ach-card tilt-card reveal d1"><span class="ach-icon">🎓</span><div class="ach-text"><h4>FIDE Rated</h4><p>Internationally recognised rating</p></div></div>
-          <div class="ach-card tilt-card reveal d2"><span class="ach-icon">👨‍🎓</span><div class="ach-text"><h4>500+ Students</h4><p>All ages &amp; skill levels</p></div></div>
-          <div class="ach-card tilt-card reveal d3"><span class="ach-icon">🏅</span><div class="ach-text"><h4>100+ FIDE Players</h4><p>Students who got rated</p></div></div>
+          <div class="ach-card tilt-card reveal d2"><span class="ach-icon">👨‍🎓</span><div class="ach-text"><h4>75+ Students</h4><p>All ages &amp; skill levels</p></div></div>
+          <div class="ach-card tilt-card reveal d3"><span class="ach-icon">🏅</span><div class="ach-text"><h4>20+ FIDE Players</h4><p>Students who got rated</p></div></div>
           <div class="ach-card tilt-card reveal d4"><span class="ach-icon">⭐</span><div class="ach-text"><h4>6 Years Teaching</h4><p>Kids, teens, adults, seniors</p></div></div>
         </div>
         <a href="#contact" class="btn-primary mag" style="display:inline-flex;align-items:center;gap:10px;"><span>♟ Start Learning Today</span></a>
@@ -1047,12 +1097,12 @@ section{position:relative;z-index:1;}
       <p class="sec-desc">Chess is the ultimate brain workout — scientifically proven to sharpen cognition, boost academic performance, and build character that lasts a lifetime.</p>
     </div>
     <div class="ben-grid">
-      <div class="ben-card tilt-card reveal d1"><div class="ben-icon">🧠</div><h3>Boosts Brainpower</h3><p>Chess activates both hemispheres simultaneously, building memory, concentration, and creative problem-solving that transfers directly to academics.</p><div class="ben-bg">♟</div></div>
-      <div class="ben-card tilt-card reveal d2"><div class="ben-icon">📚</div><h3>Academic Excellence</h3><p>Studies show chess players consistently score higher in Maths, Reading, and Science. The discipline of chess becomes a discipline for life.</p><div class="ben-bg">♜</div></div>
-      <div class="ben-card tilt-card reveal d3"><div class="ben-icon">🎯</div><h3>Strategic Thinking</h3><p>Learn to think 5 moves ahead. Chess trains long-term planning, consequence analysis, and the art of turning disadvantage into opportunity.</p><div class="ben-bg">♝</div></div>
-      <div class="ben-card tilt-card reveal d4"><div class="ben-icon">🏆</div><h3>Competitive Edge</h3><p>Earn your FIDE rating and compete nationally and internationally. Chess opens doors to tournaments, scholarships, and a global community.</p><div class="ben-bg">♛</div></div>
-      <div class="ben-card tilt-card reveal d3"><div class="ben-icon">🧘</div><h3>Emotional Resilience</h3><p>Learn to handle wins gracefully and losses constructively. Chess builds the mental toughness to never give up.</p><div class="ben-bg">♞</div></div>
-      <div class="ben-card tilt-card reveal d4"><div class="ben-icon">🌐</div><h3>Global Community</h3><p>Chess is a universal language spoken in 172 countries. Join a worldwide network of thinkers, strategists, and lifelong learners.</p><div class="ben-bg">♚</div></div>
+      <div class="ben-card tilt-card reveal d1"><div class="ben-icon">🧠</div><h3>Boosts Brainpower</h3><p>Chess activates both hemispheres simultaneously, building memory, concentration, and creative problem-solving that transfers directly to academics.</p><div class="ben-stat"><span class="ben-num counter" data-target="2" data-suffix="×">0</span><span class="ben-stat-label">Faster cognitive growth</span></div><div class="ben-bg">♟</div></div>
+      <div class="ben-card tilt-card reveal d2"><div class="ben-icon">📚</div><h3>Academic Excellence</h3><p>Studies show chess players consistently score higher in Maths, Reading, and Science. The discipline of chess becomes a discipline for life.</p><div class="ben-stat"><span class="ben-num counter" data-target="40" data-suffix="%">0</span><span class="ben-stat-label">Avg grade improvement</span></div><div class="ben-bg">♜</div></div>
+      <div class="ben-card tilt-card reveal d3"><div class="ben-icon">🎯</div><h3>Strategic Thinking</h3><p>Learn to think 5 moves ahead. Chess trains long-term planning, consequence analysis, and the art of turning disadvantage into opportunity.</p><div class="ben-stat"><span class="ben-num counter" data-target="5" data-suffix=" moves">0</span><span class="ben-stat-label">Ahead thinking trained</span></div><div class="ben-bg">♝</div></div>
+      <div class="ben-card tilt-card reveal d4"><div class="ben-icon">🏆</div><h3>Competitive Edge</h3><p>Earn your FIDE rating and compete nationally and internationally. Chess opens doors to tournaments, scholarships, and a global community.</p><div class="ben-stat"><span class="ben-num counter" data-target="20" data-suffix="+">0</span><span class="ben-stat-label">FIDE rated students</span></div><div class="ben-bg">♛</div></div>
+      <div class="ben-card tilt-card reveal d3"><div class="ben-icon">🧘</div><h3>Emotional Resilience</h3><p>Learn to handle wins gracefully and losses constructively. Chess builds the mental toughness to never give up.</p><div class="ben-stat"><span class="ben-num counter" data-target="98" data-suffix="%">0</span><span class="ben-stat-label">Student satisfaction</span></div><div class="ben-bg">♞</div></div>
+      <div class="ben-card tilt-card reveal d4"><div class="ben-icon">🌐</div><h3>Global Community</h3><p>Chess is a universal language spoken in 172 countries. Join a worldwide network of thinkers, strategists, and lifelong learners.</p><div class="ben-stat"><span class="ben-num counter" data-target="172" data-suffix="">0</span><span class="ben-stat-label">Countries play chess</span></div><div class="ben-bg">♚</div></div>
     </div>
   </div>
 </section>
@@ -1061,9 +1111,9 @@ section{position:relative;z-index:1;}
 <section id="stats">
   <div class="container">
     <div class="stats-grid">
-      <div class="stat-item reveal d1"><span class="stat-num counter" data-target="500" data-suffix="+">0</span><span class="stat-label">Students Taught</span></div>
+      <div class="stat-item reveal d1"><span class="stat-num counter" data-target="75" data-suffix="+">0</span><span class="stat-label">Students Taught</span></div>
       <div class="stat-item reveal d2"><span class="stat-num counter" data-target="6" data-suffix="+">0</span><span class="stat-label">Years Experience</span></div>
-      <div class="stat-item reveal d3"><span class="stat-num counter" data-target="100" data-suffix="+">0</span><span class="stat-label">FIDE Rated Players</span></div>
+      <div class="stat-item reveal d3"><span class="stat-num counter" data-target="20" data-suffix="+">0</span><span class="stat-label">FIDE Rated Players</span></div>
       <div class="stat-item reveal d4"><span class="stat-num">4.9★</span><span class="stat-label">Average Rating</span></div>
     </div>
   </div>
@@ -1098,14 +1148,14 @@ section{position:relative;z-index:1;}
         <div class="prog-glow"></div>
         <span class="prog-icon">♞</span>
         <div class="prog-level">Intermediate</div>
-        <h3>Knight's Academy</h3>
-        <p class="prog-desc">For players ready to level up. Master complex tactics, deepen your opening repertoire, and start competing in tournaments.</p>
+        <h3>Chess Mastery Program</h3>
+        <p class="prog-desc">For players ready to level up. Master complex tactics, deepen your opening repertoire, and start competing in online tournaments.</p>
         <ul class="prog-features">
           <li>Advanced tactics &amp; combinations</li>
           <li>Opening repertoire building</li>
           <li>Endgame mastery</li>
-          <li>Tournament preparation</li>
-          <li>Online rated game analysis</li>
+          <li>Online tournament preparation</li>
+          <li>Live game analysis sessions</li>
         </ul>
         <a href="#contact" class="prog-btn gold-btn">Enroll Now →</a>
       </div>
@@ -1166,7 +1216,7 @@ section{position:relative;z-index:1;}
       <div class="steps">
         <div class="step reveal d1"><div class="step-left"><div class="step-num">1</div><div class="step-line"></div></div><div class="step-body"><h3>Free Trial Class</h3><p>Book a complimentary 45-minute session. We assess your current level, discuss your goals, and make sure we're a perfect fit — zero pressure, zero commitment.</p></div></div>
         <div class="step reveal d2"><div class="step-left"><div class="step-num">2</div><div class="step-line"></div></div><div class="step-body"><h3>Personalised Learning Plan</h3><p>Every student receives a custom roadmap — paced learning objectives, a curated opening repertoire, and milestone goals tailored to their unique strengths and weaknesses.</p></div></div>
-        <div class="step reveal d3"><div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div><div class="step-body"><h3>Live Interactive Sessions</h3><p>Engaging 1-on-1 or group lessons via online/offline mode — combining puzzles, live game analysis, theory, and practical play.</p></div></div>
+        <div class="step reveal d3"><div class="step-left"><div class="step-num">3</div><div class="step-line"></div></div><div class="step-body"><h3>Live Online Sessions</h3><p>Engaging 1-on-1 or group lessons conducted fully online — combining puzzles, live game analysis, theory, and practical play on interactive chess platforms.</p></div></div>
         <div class="step reveal d4"><div class="step-left"><div class="step-num">4</div><div class="step-line"></div></div><div class="step-body"><h3>Track Progress &amp; Compete</h3><p>Regular performance reviews, homework assignments, and tournament guidance. Watch your rating climb as you grow from student to confident competitor.</p></div></div>
       </div>
     </div>
@@ -1181,7 +1231,7 @@ section{position:relative;z-index:1;}
       <div class="free-badge reveal">✓ &nbsp; No credit card required</div>
       <div class="sec-label reveal d1" style="justify-content:center;">Start Your Journey</div>
       <h2 class="sec-title reveal d2" style="font-size:clamp(2.2rem,4vw,3.2rem);">Your First Move is <span class="gold">Always Free</span></h2>
-      <p class="reveal d3">Join 500+ students who've already discovered the power of chess. Book your complimentary trial class today — absolutely free.</p>
+      <p class="reveal d3">Join 75+ students who've already discovered the power of chess at Krish Chess Academy. Book your complimentary trial class today — absolutely free.</p>
       <div class="cta-btns reveal d4">
         <a href="#contact" class="btn-primary mag"><span>♟ Book Free Trial Now</span></a>
         <a href="https://wa.me/919999999999" class="btn-outline mag" target="_blank">💬 Chat on WhatsApp</a>
@@ -1201,7 +1251,7 @@ section{position:relative;z-index:1;}
         <div class="c-items">
           <a href="https://wa.me/919999999999" class="c-item" target="_blank"><div class="c-icon">💬</div><div class="c-text"><h4>WhatsApp</h4><p>+91 99999 99999 · Fastest response</p></div></a>
           <a href="mailto:coach@harikrishnan.com" class="c-item"><div class="c-icon">✉️</div><div class="c-text"><h4>Email</h4><p>coach@harikrishnan.com</p></div></a>
-          <a href="#" class="c-item"><div class="c-icon">📍</div><div class="c-text"><h4>Location</h4><p>Online &amp; In-Person · India</p></div></a>
+          <a href="#" class="c-item"><div class="c-icon">💻</div><div class="c-text"><h4>Mode</h4><p>100% Online · Worldwide</p></div></a>
           <a href="#" class="c-item"><div class="c-icon">🕐</div><div class="c-text"><h4>Session Hours</h4><p>Mon–Sat · 6:00 AM – 9:00 PM IST</p></div></a>
         </div>
       </div>
@@ -1219,8 +1269,8 @@ section{position:relative;z-index:1;}
       </div>
     </div>
     <div class="footer-bar">
-      <div class="footer-logo">♛ <span>Hari</span>krishnan Chess Academy</div>
-      <p class="footer-copy">© 2025 Harikrishnan Chess Academy · All rights reserved</p>
+      <div class="footer-logo">♛ <span>Krish</span> Chess Academy</div>
+      <p class="footer-copy">© 2025 Krish Chess Academy · All rights reserved</p>
       <div class="footer-socials">
         <a href="#" class="s-link">📷</a>
         <a href="#" class="s-link">▶</a>
@@ -1233,16 +1283,125 @@ section{position:relative;z-index:1;}
 
 <script>
 /* ══════════════════════════════════════
-   CHESS BOARD BUILD
+   CHESS BOARD — ANIMATED LIVE BOARD
 ══════════════════════════════════════ */
 (function(){
   const b=document.getElementById('chess-board');
   if(!b)return;
+  b.innerHTML='';
+  b.style.position='relative';
+
+  // Build 8×8 squares
   for(let r=0;r<8;r++)for(let c=0;c<8;c++){
-    const cell=document.createElement('div');
-    cell.className='bc '+((r+c)%2===0?'l':'d');
-    b.appendChild(cell);
+    const sq=document.createElement('div');
+    sq.className='bc '+((r+c)%2===0?'l':'d');
+    sq.id='sq-'+r+'-'+c;
+    b.appendChild(sq);
   }
+
+  // Piece overlay layer
+  const pl=document.createElement('div');
+  pl.style.cssText='position:absolute;inset:0;z-index:4;pointer-events:none;';
+  b.appendChild(pl);
+
+  // State: "r,c" → {el, piece, isWhite}
+  const state={};
+
+  const startPos=[
+    [0,0,'♜',false],[0,1,'♞',false],[0,2,'♝',false],[0,3,'♛',false],
+    [0,4,'♚',false],[0,5,'♝',false],[0,6,'♞',false],[0,7,'♜',false],
+    [1,0,'♟',false],[1,1,'♟',false],[1,2,'♟',false],[1,3,'♟',false],
+    [1,4,'♟',false],[1,5,'♟',false],[1,6,'♟',false],[1,7,'♟',false],
+    [6,0,'♙',true],[6,1,'♙',true],[6,2,'♙',true],[6,3,'♙',true],
+    [6,4,'♙',true],[6,5,'♙',true],[6,6,'♙',true],[6,7,'♙',true],
+    [7,0,'♖',true],[7,1,'♘',true],[7,2,'♗',true],[7,3,'♕',true],
+    [7,4,'♔',true],[7,5,'♗',true],[7,6,'♘',true],[7,7,'♖',true],
+  ];
+
+  function placePiece(r,c,p,isWhite){
+    const el=document.createElement('div');
+    el.className='chp '+(isWhite?'chp-w':'chp-b');
+    el.textContent=p;
+    el.style.left=(c*12.5)+'%';
+    el.style.top=(r*12.5)+'%';
+    pl.appendChild(el);
+    state[r+','+c]={el,piece:p,isWhite};
+  }
+
+  function resetBoard(){
+    Object.values(state).forEach(pc=>pc.el.remove());
+    Object.keys(state).forEach(k=>delete state[k]);
+    startPos.forEach(([r,c,p,w])=>placePiece(r,c,p,w));
+  }
+
+  function highlightSq(r,c,dur=600){
+    const sq=document.getElementById('sq-'+r+'-'+c);
+    if(!sq)return;
+    sq.classList.add('sq-hi');
+    setTimeout(()=>sq.classList.remove('sq-hi'),dur);
+  }
+
+  function movePiece(fr,fc,tr,tc,cb){
+    const k=fr+','+fc,dk=tr+','+tc;
+    const pc=state[k];
+    if(!pc){if(cb)cb();return;}
+    // capture
+    if(state[dk]){state[dk].el.remove();delete state[dk];}
+    highlightSq(fr,fc,400);
+    pc.el.classList.add('moving');
+    pc.el.style.left=(tc*12.5)+'%';
+    pc.el.style.top=(tr*12.5)+'%';
+    delete state[k];
+    state[dk]=pc;
+    setTimeout(()=>{
+      pc.el.classList.remove('moving');
+      highlightSq(tr,tc,500);
+      if(cb)cb();
+    },800);
+  }
+
+  // Italian Game opening sequence (loops forever)
+  const seq=[
+    [[6,4],[4,4]],  // 1. e4
+    [[1,4],[3,4]],  // 1...e5
+    [[7,6],[5,5]],  // 2. Nf3
+    [[0,1],[2,2]],  // 2...Nc6
+    [[7,5],[4,2]],  // 3. Bc4
+    [[0,5],[3,2]],  // 3...Bc5
+    [[6,3],[4,3]],  // 4. d4
+    [[3,4],[4,3]],  // 4...exd4
+    [[5,5],[4,3]],  // 5. Nxd4
+    [[2,2],[4,3]],  // 5...Nxd4
+    [[7,3],[5,5]],  // 6. Qd1–f3 (visual)
+    [[0,6],[2,5]],  // 6...Nf6
+    [[5,5],[7,5]],  // 7. Qf3–f7+ (dramatic queen)
+  ];
+
+  resetBoard();
+
+  function runSeq(idx){
+    if(idx>=seq.length){
+      setTimeout(()=>{resetBoard();setTimeout(()=>runSeq(0),1500);},1800);
+      return;
+    }
+    const [[fr,fc],[tr,tc]]=seq[idx];
+    setTimeout(()=>movePiece(fr,fc,tr,tc,()=>runSeq(idx+1)),1600);
+  }
+
+  // Start after preloader (delay 2.8s)
+  setTimeout(()=>runSeq(0),2800);
+
+  // Mouse hover glow on squares
+  b.addEventListener('mousemove',e=>{
+    const rect=b.getBoundingClientRect();
+    const x=e.clientX-rect.left,y=e.clientY-rect.top;
+    const c=Math.floor(x/rect.width*8);
+    const r=Math.floor(y/rect.height*8);
+    document.querySelectorAll('.bc.sq-hover').forEach(s=>s.classList.remove('sq-hover'));
+    const sq=document.getElementById('sq-'+r+'-'+c);
+    if(sq)sq.style.filter='brightness(1.3)';
+    setTimeout(()=>{if(sq)sq.style.filter='';},200);
+  });
 })();
 
 /* ══════════════════════════════════════
